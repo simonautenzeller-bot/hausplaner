@@ -29,6 +29,12 @@
   color-scheme: light;
 }
 
+/* Himmel: wie Hell, nur der Seitenhintergrund im Blauton, den die App selbst schon
+   für „Fixkosten/Jahr“ nutzt (--accent-sky-bg) – Karten bleiben weiß wie Wolken. */
+:root[data-theme='sky'] {
+  --bg: var(--accent-sky-bg);
+}
+
 :root[data-theme='dark'],
 :root[data-theme='dim'] {
   --bg: #15181c;
@@ -65,7 +71,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='dim']) {
+  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='dim']):not([data-theme='sky']) {
     --bg: #15181c;
     --surface: #21262b;
     --surface-alt: #2a3036;
@@ -408,7 +414,7 @@ button {
 .badge-prio-niedrig { background: var(--accent-sky-bg); color: var(--accent-sky); }
 :root[data-theme='dark'] .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([data-theme='dark']) .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
+  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='sky']) .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
 }
 
 .progress-track {
@@ -439,21 +445,22 @@ button {
 .hint { color: var(--text-muted); font-size: 0.9rem; }
 
 .segmented {
-  display: inline-flex;
-  border: 1.5px solid var(--border);
-  border-radius: 999px;
-  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .segmented button {
-  border: none;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   background: var(--surface);
-  padding: 0.55rem 1rem;
+  padding: 0.5rem 0.95rem;
   cursor: pointer;
   min-height: 44px;
   font-weight: 600;
 }
 .segmented button[aria-checked='true'] {
   background: var(--primary);
+  border-color: var(--primary);
   color: var(--primary-contrast);
 }
 

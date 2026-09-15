@@ -1,0 +1,17 @@
+{
+  "name": "Hausplaner",
+  "short_name": "Hausplaner",
+  "description": "Anschaffungen und Fixkosten für unser Zuhause planen",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101418",
+  "theme_color": "#2e7d32",
+  "lang": "de",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

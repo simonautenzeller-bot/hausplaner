@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2e7d32" />
+<meta name="description" content="Anschaffungen und Fixkosten für unser Zuhause planen" />
+<title>Hausplaner</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Zum Inhalt springen</a>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="demo-banner" class="demo-banner" hidden role="status">
+  <span>🎭 Demo-Modus – du siehst Beispieldaten, keine echten Einträge.</span>
+  <button type="button" class="btn btn-secondary" id="btn-exit-demo">Demo beenden</button>
+</div>
+
+<header class="app-header">
+  <h1>Hausplaner</h1>
+</header>
+
+<main id="main-content" tabindex="-1">
+
+  <!-- Übersicht -->
+  <section id="view-dashboard" class="view" aria-labelledby="dashboard-heading">
+    <h2 id="dashboard-heading">Übersicht</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Wunschliste (offen)</span>
+        <span class="stat-value" id="stat-wishlist-total">0,00 €</span>
+        <span class="stat-sub" id="stat-wishlist-count">0 Einträge</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Fixkosten / Monat</span>
+        <span class="stat-value" id="stat-fixed-monthly">0,00 €</span>
+        <span class="stat-sub" id="stat-fixed-count">0 Posten</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Fixkosten / Jahr (hochgerechnet)</span>
+        <span class="stat-value" id="stat-fixed-yearly">0,00 €</span>
+      </div>
+    </div>
+
+    <h3>Fixkosten nach Kategorie</h3>
+    <ul class="breakdown-list" id="dashboard-fixed-breakdown"></ul>
+
+    <h3>Wunschliste nach Kategorie</h3>
+    <ul class="breakdown-list" id="dashboard-wishlist-breakdown"></ul>
+  </section>
+
+  <!-- Wunschliste -->
+  <section id="view-wishlist" class="view" aria-labelledby="wishlist-heading" hidden>
+    <div class="view-header">
+      <h2 id="wishlist-heading">Wunschliste</h2>
+      <button type="button" class="btn btn-primary" id="btn-add-wishlist">+ Eintrag</button>
+    </div>
+    <div class="chip-row" id="wishlist-filter-chips" role="group" aria-label="Nach Kategorie filtern"></div>
+    <label class="checkbox-row">
+      <input type="checkbox" id="toggle-show-purchased" />
+      Gekaufte Einträge anzeigen
+    </label>
+    <ul class="item-list" id="wishlist-list"></ul>
+    <p class="empty-state" id="wishlist-empty" hidden>Noch nichts eingetragen. Leg mit „+ Eintrag“ los.</p>
+  </section>
+
+  <!-- Fixkosten -->
+  <section id="view-fixed" class="view" aria-labelledby="fixed-heading" hidden>
+    <div class="view-header">
+      <h2 id="fixed-heading">Fixkosten</h2>
+      <button type="button" class="btn btn-primary" id="btn-add-fixed">+ Posten</button>
+    </div>
+    <div class="chip-row" id="fixed-filter-chips" role="group" aria-label="Nach Kategorie filtern"></div>
+    <ul class="item-list" id="fixed-list"></ul>
+    <p class="empty-state" id="fixed-empty" hidden>Noch keine Fixkosten erfasst.</p>
+  </section>
+
+  <!-- Einstellungen -->
+  <section id="view-settings" class="view" aria-labelledby="settings-heading" hidden>
+    <h2 id="settings-heading">Einstellungen</h2>
+
+    <section class="settings-block" aria-labelledby="theme-heading">
+      <h3 id="theme-heading">Darstellung</h3>
+      <div class="segmented" role="radiogroup" aria-labelledby="theme-heading" id="theme-switcher">
+        <button type="button" role="radio" data-theme="light" aria-checked="false">Hell</button>
+        <button type="button" role="radio" data-theme="dark" aria-checked="false">Dunkel</button>
+        <button type="button" role="radio" data-theme="system" aria-checked="false">System</button>
+      </div>
+    </section>
+
+    <section class="settings-block" aria-labelledby="demo-heading">
+      <h3 id="demo-heading">Demo-Modus</h3>
+      <p class="hint">Zeig die App jemandem, ohne deine eigenen Daten preiszugeben. Im Demo-Modus siehst und bearbeitest du realistische Beispieldaten in einem eigenen Speicherbereich – deine echten Einträge bleiben unangetastet und sind sofort wieder da, wenn du den Demo-Modus beendest.</p>
+      <button type="button" class="btn btn-secondary" id="btn-toggle-demo">Demo-Modus starten</button>
+    </section>
+
+    <section class="settings-block" aria-labelledby="cat-wishlist-heading">
+      <div class="view-header">
+        <h3 id="cat-wishlist-heading">Kategorien Wunschliste</h3>
+        <button type="button" class="btn btn-secondary" id="btn-add-cat-wishlist">+ Kategorie</button>
+      </div>
+      <ul class="category-list" id="category-list-wishlist"></ul>
+    </section>
+
+    <section class="settings-block" aria-labelledby="cat-fixed-heading">
+      <div class="view-header">
+        <h3 id="cat-fixed-heading">Kategorien Fixkosten</h3>
+        <button type="button" class="btn btn-secondary" id="btn-add-cat-fixed">+ Kategorie</button>
+      </div>
+      <ul class="category-list" id="category-list-fixed"></ul>
+    </section>
+
+    <section class="settings-block" aria-labelledby="data-heading">
+      <h3 id="data-heading">Daten</h3>
+      <p class="hint">Alle Daten liegen ausschließlich lokal auf diesem Gerät (localStorage). Nutze Export/Import als Backup oder zum Übertragen auf ein anderes Gerät.</p>
+      <div class="button-row">
+        <button type="button" class="btn btn-secondary" id="btn-export">Daten exportieren</button>
+        <button type="button" class="btn btn-secondary" id="btn-import">Daten importieren</button>
+        <input type="file" id="file-import" accept="application/json" class="visually-hidden" />
+      </div>
+      <button type="button" class="btn btn-danger" id="btn-reset">Alle Daten zurücksetzen</button>
+    </section>
+
+    <section class="settings-block" aria-labelledby="about-heading">
+      <h3 id="about-heading">Über die App</h3>
+      <p class="hint">Hausplaner Version <span id="app-version"></span></p>
+    </section>
+  </section>
+
+</main>
+
+<nav class="bottom-nav" aria-label="Hauptnavigation">
+  <button type="button" class="nav-btn" data-view="dashboard" aria-current="page">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 10v11h6v-6h6v6h6V10z"/></svg>
+    <span>Übersicht</span>
+  </button>
+  <button type="button" class="nav-btn" data-view="wishlist">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h2l1.2 10.6a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>
+    <span>Wunschliste</span>
+  </button>
+  <button type="button" class="nav-btn" data-view="fixed">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+    <span>Fixkosten</span>
+  </button>
+  <button type="button" class="nav-btn" data-view="settings">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    <span>Einstellungen</span>
+  </button>
+</nav>
+
+<dialog id="form-dialog">
+  <form id="entity-form" novalidate>
+    <h2 id="form-dialog-title">Titel</h2>
+    <div id="form-fields"></div>
+    <p class="form-error" id="form-error" role="alert" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary" id="btn-cancel-form">Abbrechen</button>
+      <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

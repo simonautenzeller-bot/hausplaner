@@ -37,6 +37,11 @@
         <span class="stat-sub" id="stat-wishlist-count">0 Einträge</span>
       </div>
       <div class="stat-card">
+        <span class="stat-label">Vermögen</span>
+        <span class="stat-value" id="stat-assets-total">–</span>
+        <span class="stat-sub" id="stat-assets-sub">aus Finanzen-App</span>
+      </div>
+      <div class="stat-card">
         <span class="stat-label">Fixkosten / Monat</span>
         <span class="stat-value" id="stat-fixed-monthly">0,00 €</span>
         <span class="stat-sub" id="stat-fixed-count">0 Posten</span>
@@ -83,6 +88,18 @@
     <div class="chip-row" id="fixed-filter-chips" role="group" aria-label="Nach Kategorie filtern"></div>
     <ul class="item-list" id="fixed-list"></ul>
     <p class="empty-state" id="fixed-empty" hidden>Noch keine Fixkosten erfasst.</p>
+  </section>
+
+  <!-- Vermögen -->
+  <section id="view-assets" class="view" aria-labelledby="assets-heading" hidden>
+    <h2 id="assets-heading">Vermögen</h2>
+    <p class="hint">Nur Anzeige, keine doppelte Pflege: Die Werte kommen live aus der Finanzen-App. Bearbeiten geht weiterhin drüben.</p>
+    <div class="stat-card" id="assets-total-card" hidden>
+      <span class="stat-label">Gesamt</span>
+      <span class="stat-value" id="assets-total-value">0,00 €</span>
+    </div>
+    <ul class="item-list" id="assets-list"></ul>
+    <p class="empty-state" id="assets-empty" hidden></p>
   </section>
 
   <!-- Einstellungen -->
@@ -151,6 +168,10 @@
   <button type="button" class="nav-btn" data-view="fixed">
     <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
     <span>Fixkosten</span>
+  </button>
+  <button type="button" class="nav-btn" data-view="assets">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M9 9.3c0-1.5 1.3-2.6 3-2.6s3 1.1 3 2.6c0 1.4-1.3 2.1-3 2.6-1.7.5-3 1.2-3 2.6s1.3 2.6 3 2.6 3-1.1 3-2.6"/></svg>
+    <span>Vermögen</span>
   </button>
   <button type="button" class="nav-btn" data-view="settings">
     <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg>

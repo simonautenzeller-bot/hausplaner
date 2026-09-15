@@ -183,7 +183,6 @@ button {
   gap: 0.15rem;
   box-shadow: var(--shadow);
 }
-.stat-card:first-child { grid-column: 1 / -1; }
 .stat-label { font-size: 0.8rem; color: var(--text-muted); }
 .stat-value { font-size: 1.5rem; font-weight: 700; }
 .stat-sub { font-size: 0.8rem; color: var(--text-muted); }
@@ -581,6 +580,5 @@ dialog h2 {
 }
 
 @media (min-width: 700px) {
-  .stat-grid { grid-template-columns: 1fr 1fr 1fr; }
-  .stat-card:first-child { grid-column: auto; }
+  .stat-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
 }

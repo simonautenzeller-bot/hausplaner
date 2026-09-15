@@ -4,7 +4,7 @@
   const ui = window.UI;
 
   // ---------- Ansicht / Navigation ----------
-  const VIEWS = ['dashboard', 'wishlist', 'fixed', 'settings'];
+  const VIEWS = ['dashboard', 'wishlist', 'fixed', 'assets', 'settings'];
 
   function switchView(view) {
     if (!VIEWS.includes(view)) view = 'dashboard';
@@ -334,6 +334,11 @@
   ui.renderVersion();
   ui.renderAll();
   switchView(location.hash.slice(1) || 'dashboard');
+
+  // Lebt die Finanzen-App in einem anderen Tab derselben Origin, hier live mitziehen.
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'finanzen-app:v3') ui.renderAll();
+  });
 
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
     window.addEventListener('load', () => {

@@ -4,8 +4,9 @@
   const LIVE_KEY = 'hausplaner:data';
   const DEMO_KEY = 'hausplaner:demo-data';
   const MODE_KEY = 'hausplaner:mode';
+  const FINANZEN_KEY = 'finanzen-app:v3';
   const SCHEMA_VERSION = 1;
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '1.3.0';
 
   function uid() {
     if (window.crypto?.randomUUID) return crypto.randomUUID();
@@ -263,6 +264,22 @@
     return amount;
   }
 
+  // ---- Vermögen (schreibgeschützter Import aus der Finanzen-App) ----
+  // Liest ausschließlich; Hausplaner+ legt nie eigene Vermögenswerte an, um
+  // Doppelpflege zu vermeiden. Funktioniert nur, wenn beide Apps unter derselben
+  // Origin laufen (z. B. beide auf github.io desselben Accounts).
+  function getExternalAssets() {
+    try {
+      const raw = localStorage.getItem(FINANZEN_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.assets)) return null;
+      return parsed.assets;
+    } catch {
+      return null;
+    }
+  }
+
   // ---- Export / Import / Reset ----
   function exportData() {
     return JSON.stringify(data, null, 2);
@@ -310,5 +327,6 @@
     importData,
     resetData,
     onChange,
+    getExternalAssets,
   };
 })();

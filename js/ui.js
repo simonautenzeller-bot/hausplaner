@@ -46,6 +46,18 @@
 
     renderLoans(allFixed.filter((f) => f.isLoan));
 
+    const externalAssets = store.getExternalAssets();
+    const assetsTotalEl = document.getElementById('stat-assets-total');
+    const assetsSubEl = document.getElementById('stat-assets-sub');
+    if (externalAssets === null) {
+      assetsTotalEl.textContent = '–';
+      assetsSubEl.textContent = 'Finanzen-App nicht verbunden';
+    } else {
+      const sum = externalAssets.reduce((s, a) => s + (Number(a.value) || 0), 0);
+      assetsTotalEl.textContent = currency(sum);
+      assetsSubEl.textContent = `${externalAssets.length} Position${externalAssets.length === 1 ? '' : 'en'} · Finanzen-App`;
+    }
+
     const fixedByCat = document.getElementById('dashboard-fixed-breakdown');
     fixedByCat.innerHTML = '';
     const fixedCats = store.getCategories('fixed');
@@ -327,6 +339,55 @@
     });
   }
 
+  // ---------- Vermögen (read-only aus Finanzen-App) ----------
+  const OWNER_LABEL = { ich: 'Ich', partner: 'Partner' };
+
+  function formatDateDE(s) {
+    if (!s) return '';
+    const [y, m, d] = s.split('-');
+    return d && m && y ? `${d}.${m}.${y}` : s;
+  }
+
+  function renderAssetsView() {
+    const list = document.getElementById('assets-list');
+    const empty = document.getElementById('assets-empty');
+    const totalCard = document.getElementById('assets-total-card');
+    const totalValue = document.getElementById('assets-total-value');
+    const assets = store.getExternalAssets();
+
+    list.innerHTML = '';
+
+    if (assets === null) {
+      totalCard.hidden = true;
+      empty.hidden = false;
+      empty.textContent = 'Keine Finanzen-App-Daten auf diesem Gerät gefunden. Öffne einmal die Finanzen-App im selben Browser (gleiche Domain) – die Werte erscheinen dann automatisch hier.';
+      return;
+    }
+    if (assets.length === 0) {
+      totalCard.hidden = true;
+      empty.hidden = false;
+      empty.textContent = 'In der Finanzen-App sind noch keine Vermögenswerte eingetragen.';
+      return;
+    }
+
+    empty.hidden = true;
+    totalCard.hidden = false;
+    const sum = assets.reduce((s, a) => s + (Number(a.value) || 0), 0);
+    totalValue.textContent = currency(sum);
+
+    assets.forEach((a) => {
+      list.appendChild(
+        el('li', { class: 'item-card' }, [
+          el('div', { class: 'item-top' }, [
+            el('span', { class: 'item-title', text: a.name || 'Ohne Namen' }),
+            el('span', { class: 'item-title', text: currency(a.value) }),
+          ]),
+          el('div', { class: 'item-meta', text: `${OWNER_LABEL[a.owner] || a.owner || ''}${a.date ? ' · Stand ' + formatDateDE(a.date) : ''}` }),
+        ])
+      );
+    });
+  }
+
   // ---------- Settings: Kategorien ----------
   function renderCategoryLists() {
     renderCategoryList('wishlist', 'category-list-wishlist');
@@ -396,6 +457,7 @@
     renderWishlist();
     renderFixedFilters();
     renderFixed();
+    renderAssetsView();
     renderCategoryLists();
     renderTheme();
     renderDemoState();

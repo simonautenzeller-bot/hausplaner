@@ -58,7 +58,6 @@ html, body {
   font-size: 16px;
   line-height: 1.5;
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 body {
@@ -107,6 +106,7 @@ button {
   max-width: 640px;
   margin: 0 auto;
   padding: 0 1rem 1rem;
+  overflow-x: hidden;
 }
 
 .view h2 {
@@ -207,6 +207,57 @@ button {
 }
 .breakdown-list .empty { color: var(--text-muted); border: none; background: none; padding: 0.4rem 0; }
 
+/* Kredit-Zeitleiste */
+.loan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.loan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  box-shadow: var(--shadow);
+}
+.loan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+.loan-amounts {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+.loan-track {
+  height: 10px;
+  background: var(--surface-alt);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.6rem;
+}
+.loan-fill {
+  height: 100%;
+  background: var(--primary);
+}
+.loan-timeline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+.loan-timeline span:last-child {
+  text-align: right;
+}
+
 /* Chips */
 .chip-row {
   display: flex;
@@ -273,6 +324,13 @@ button {
 .item-note {
   font-size: 0.9rem;
   margin-top: 0.4rem;
+}
+.item-note a {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .item-actions {
   display: flex;

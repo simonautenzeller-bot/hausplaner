@@ -36,11 +36,15 @@
     document.getElementById('stat-wishlist-total').textContent = currency(wishTotal);
     document.getElementById('stat-wishlist-count').textContent = `${items.length} Einträge offen`;
 
-    const fixed = store.getFixedCosts();
+    // Kredite laufen als eigene Zeitleiste, getrennt von den regulären Fixkosten-Summen.
+    const allFixed = store.getFixedCosts();
+    const fixed = allFixed.filter((f) => !f.isLoan);
     const monthlyTotal = fixed.reduce((s, f) => s + store.toMonthly(f.amount, f.cycle), 0);
     document.getElementById('stat-fixed-monthly').textContent = currency(monthlyTotal);
     document.getElementById('stat-fixed-count').textContent = `${fixed.length} Posten`;
     document.getElementById('stat-fixed-yearly').textContent = currency(monthlyTotal * 12);
+
+    renderLoans(allFixed.filter((f) => f.isLoan));
 
     const fixedByCat = document.getElementById('dashboard-fixed-breakdown');
     fixedByCat.innerHTML = '';
@@ -86,6 +90,51 @@
         );
       });
     }
+  }
+
+  function renderLoans(loans) {
+    const wrap = document.getElementById('dashboard-loans-wrap');
+    const list = document.getElementById('dashboard-loans');
+    if (!wrap || !list) return;
+    const active = loans.filter((l) => l.totalAmount > 0);
+    list.innerHTML = '';
+    wrap.hidden = active.length === 0;
+
+    active.forEach((loan) => {
+      const cat = catById(loan.categoryId);
+      const remaining = Math.max(loan.totalAmount - loan.alreadyPaid, 0);
+      const pct = Math.min(100, Math.round((loan.alreadyPaid / loan.totalAmount) * 100));
+      const monthly = store.toMonthly(loan.amount, loan.cycle);
+
+      let etaLabel = 'abbezahlt';
+      if (remaining > 0) {
+        etaLabel = 'unbekannt';
+        if (monthly > 0) {
+          const monthsLeft = Math.ceil(remaining / monthly);
+          const eta = new Date();
+          eta.setMonth(eta.getMonth() + monthsLeft);
+          etaLabel = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(eta);
+        }
+      }
+
+      list.appendChild(
+        el('li', { class: 'loan-card' }, [
+          el('div', { class: 'loan-top' }, [
+            el('span', { text: `${cat ? cat.icon + ' ' : ''}${loan.name}` }),
+            el('span', { text: `${pct}%` }),
+          ]),
+          el('div', { class: 'loan-amounts', text: `${currency(remaining)} Restschuld von ${currency(loan.totalAmount)} · ${currency(monthly)}/Monat` }),
+          el('div', { class: 'loan-track', role: 'progressbar', 'aria-valuenow': String(pct), 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': `${loan.name} zu ${pct}% abbezahlt` }, [
+            el('div', { class: 'loan-fill', style: `width:${pct}%` }),
+          ]),
+          el('div', { class: 'loan-timeline' }, [
+            el('span', { text: 'Start' }),
+            el('span', { text: `Heute · ${pct}%` }),
+            el('span', { text: remaining > 0 ? `Ziel: ${etaLabel}` : 'Abbezahlt 🎉' }),
+          ]),
+        ])
+      );
+    });
   }
 
   // ---------- Wunschliste ----------
@@ -186,7 +235,7 @@
           prioBadge,
         ]),
         item.note ? el('div', { class: 'item-note', text: item.note }) : null,
-        item.link ? el('div', { class: 'item-note' }, [el('a', { href: item.link, target: '_blank', rel: 'noopener noreferrer', text: item.link })]) : null,
+        item.link ? el('div', { class: 'item-note' }, [el('a', { href: item.link, target: '_blank', rel: 'noopener noreferrer', title: item.link, text: item.link })]) : null,
       ]);
       list.appendChild(card);
     });

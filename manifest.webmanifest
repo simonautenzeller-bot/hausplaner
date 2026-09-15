@@ -1,6 +1,6 @@
 {
-  "name": "Hausplaner",
-  "short_name": "Hausplaner",
+  "name": "Hausplaner+",
+  "short_name": "Hausplaner+",
   "description": "Anschaffungen und Fixkosten für unser Zuhause planen",
   "start_url": "./index.html",
   "scope": "./",

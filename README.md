@@ -1,4 +1,4 @@
-# Hausplaner
+# Hausplaner+
 
 Installierbare Mobile-PWA zum Planen von Anschaffungen (Wunschliste) und
 wiederkehrenden Fixkosten (Kredit, Versicherung, Strom, Wasser, Müllgebühren, …)

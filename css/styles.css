@@ -29,14 +29,9 @@
   color-scheme: light;
 }
 
-/* Himmel: wie Hell, nur der Seitenhintergrund im Blauton, den die App selbst schon
-   für „Fixkosten/Jahr“ nutzt (--accent-sky-bg) – Karten bleiben weiß wie Wolken. */
-:root[data-theme='sky'] {
-  --bg: var(--accent-sky-bg);
-}
-
 :root[data-theme='dark'],
-:root[data-theme='dim'] {
+:root[data-theme='dim'],
+:root[data-theme='sky'] {
   --bg: #15181c;
   --surface: #21262b;
   --surface-alt: #2a3036;
@@ -68,6 +63,12 @@
    Karten, Akzente und Text bleiben wie im Dark Theme, wie in der Finanzen-App. */
 :root[data-theme='dim'] {
   --bg: #3b4252;
+}
+
+/* Himmel: wie Dim, nur der Seitenhintergrund in Blau statt Grau – dunkle Kacheln
+   bleiben, der Hintergrund liest sich als Nachthimmel statt als neutrales Grau. */
+:root[data-theme='sky'] {
+  --bg: #24466a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -412,9 +413,11 @@ button {
 .badge-prio-hoch { background: #ffd7cc; color: #7a2205; }
 .badge-prio-mittel { background: var(--primary-bg); color: var(--primary); }
 .badge-prio-niedrig { background: var(--accent-sky-bg); color: var(--accent-sky); }
-:root[data-theme='dark'] .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
+:root[data-theme='dark'] .badge-prio-hoch,
+:root[data-theme='dim'] .badge-prio-hoch,
+:root[data-theme='sky'] .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='sky']) .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
+  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='dim']):not([data-theme='sky']) .badge-prio-hoch { background: #6c2a20; color: #ffd7cc; }
 }
 
 .progress-track {

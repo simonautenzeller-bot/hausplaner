@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hausplaner-cache-v8';
+const CACHE_NAME = 'hausplaner-cache-v9';
 const APP_SHELL = [
   './',
   './index.html',

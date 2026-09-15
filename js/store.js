@@ -6,7 +6,7 @@
   const MODE_KEY = 'hausplaner:mode';
   const FINANZEN_KEY = 'finanzen-app:v3';
   const SCHEMA_VERSION = 1;
-  const APP_VERSION = '1.4.0';
+  const APP_VERSION = '1.5.0';
 
   function uid() {
     if (window.crypto?.randomUUID) return crypto.randomUUID();

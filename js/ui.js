@@ -17,6 +17,16 @@
     return store.getData().categories.find((c) => c.id === id);
   }
 
+  // Wählt Schwarz/Weiß als Textfarbe je nach Helligkeit der übergebenen Kategoriefarbe.
+  function readableTextOn(hex) {
+    const c = (hex || '#607d8b').replace('#', '');
+    const r = parseInt(c.substr(0, 2), 16) || 0;
+    const g = parseInt(c.substr(2, 2), 16) || 0;
+    const b = parseInt(c.substr(4, 2), 16) || 0;
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? '#201c1a' : '#ffffff';
+  }
+
   function el(tag, attrs = {}, children = []) {
     const node = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
@@ -156,9 +166,9 @@
     const row = document.getElementById('wishlist-filter-chips');
     row.innerHTML = '';
     const cats = store.getCategories('wishlist');
-    const makeChip = (id, label) => {
+    const makeChip = (id, label, color) => {
       const pressed = wishlistFilter === id;
-      return el('button', {
+      const attrs = {
         class: 'chip',
         type: 'button',
         'aria-pressed': String(pressed),
@@ -168,10 +178,14 @@
           renderWishlistFilters();
           renderWishlist();
         },
-      });
+      };
+      if (pressed && color) {
+        attrs.style = `background:${color};border-color:${color};color:${readableTextOn(color)}`;
+      }
+      return el('button', attrs);
     };
     row.appendChild(makeChip('all', 'Alle'));
-    cats.forEach((c) => row.appendChild(makeChip(c.id, `${c.icon} ${c.name}`)));
+    cats.forEach((c) => row.appendChild(makeChip(c.id, `${c.icon} ${c.name}`, c.color)));
   }
 
   function renderWishlist() {
@@ -194,15 +208,18 @@
         item.priority === 'hoch'
           ? el('span', { class: 'badge badge-prio-hoch', text: 'hoch' })
           : item.priority === 'niedrig'
-          ? el('span', { class: 'badge', text: 'niedrig' })
-          : null;
+          ? el('span', { class: 'badge badge-prio-niedrig', text: 'niedrig' })
+          : el('span', { class: 'badge badge-prio-mittel', text: 'mittel' });
 
       const titleSpan = el('span', {
         class: 'item-title',
         html: item.purchased ? `<span class="purchased-strike">${escapeHtml(item.name)}</span>` : escapeHtml(item.name),
       });
 
-      const card = el('li', { class: 'item-card' + (item.purchased ? ' purchased' : '') }, [
+      const card = el('li', {
+        class: 'item-card' + (item.purchased ? ' purchased' : ''),
+        style: cat ? `border-left-color:${cat.color}` : '',
+      }, [
         el('div', { class: 'item-top' }, [
           el('label', { class: 'checkbox-row', style: 'margin:0;min-height:auto;' }, [
             el('input', {
@@ -260,9 +277,9 @@
     const row = document.getElementById('fixed-filter-chips');
     row.innerHTML = '';
     const cats = store.getCategories('fixed');
-    const makeChip = (id, label) => {
+    const makeChip = (id, label, color) => {
       const pressed = fixedFilter === id;
-      return el('button', {
+      const attrs = {
         class: 'chip',
         type: 'button',
         'aria-pressed': String(pressed),
@@ -272,10 +289,14 @@
           renderFixedFilters();
           renderFixed();
         },
-      });
+      };
+      if (pressed && color) {
+        attrs.style = `background:${color};border-color:${color};color:${readableTextOn(color)}`;
+      }
+      return el('button', attrs);
     };
     row.appendChild(makeChip('all', 'Alle'));
-    cats.forEach((c) => row.appendChild(makeChip(c.id, `${c.icon} ${c.name}`)));
+    cats.forEach((c) => row.appendChild(makeChip(c.id, `${c.icon} ${c.name}`, c.color)));
   }
 
   const CYCLE_LABEL = { monthly: 'monatlich', quarterly: 'vierteljährlich', yearly: 'jährlich' };
@@ -305,7 +326,7 @@
         ]);
       }
 
-      const card = el('li', { class: 'item-card' }, [
+      const card = el('li', { class: 'item-card', style: cat ? `border-left-color:${cat.color}` : '' }, [
         el('div', { class: 'item-top' }, [
           el('span', { class: 'item-title', text: item.name }),
           el('div', { class: 'item-actions' }, [
@@ -377,7 +398,7 @@
 
     assets.forEach((a) => {
       list.appendChild(
-        el('li', { class: 'item-card' }, [
+        el('li', { class: 'item-card', style: 'border-left-color:var(--accent-teal)' }, [
           el('div', { class: 'item-top' }, [
             el('span', { class: 'item-title', text: a.name || 'Ohne Namen' }),
             el('span', { class: 'item-title', text: currency(a.value) }),
@@ -400,7 +421,10 @@
     store.getCategories(type).forEach((cat) => {
       container.appendChild(
         el('li', {}, [
-          el('span', { class: 'cat-label', text: `${cat.icon} ${cat.name}` }),
+          el('span', { class: 'cat-label' }, [
+            el('span', { class: 'cat-swatch', style: `background:${cat.color}` }),
+            document.createTextNode(`${cat.icon} ${cat.name}`),
+          ]),
           el('div', { class: 'item-actions' }, [
             el('button', {
               class: 'btn-icon',

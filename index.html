@@ -31,22 +31,22 @@
   <section id="view-dashboard" class="view" aria-labelledby="dashboard-heading">
     <h2 id="dashboard-heading">Übersicht</h2>
     <div class="stat-grid">
-      <div class="stat-card">
+      <div class="stat-card" data-accent="rose">
         <span class="stat-label">Wunschliste (offen)</span>
         <span class="stat-value" id="stat-wishlist-total">0,00 €</span>
         <span class="stat-sub" id="stat-wishlist-count">0 Einträge</span>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-accent="teal">
         <span class="stat-label">Vermögen</span>
         <span class="stat-value" id="stat-assets-total">–</span>
         <span class="stat-sub" id="stat-assets-sub">aus Finanzen-App</span>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-accent="amber">
         <span class="stat-label">Fixkosten / Monat</span>
         <span class="stat-value" id="stat-fixed-monthly">0,00 €</span>
         <span class="stat-sub" id="stat-fixed-count">0 Posten</span>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" data-accent="sky">
         <span class="stat-label">Fixkosten / Jahr (hochgerechnet)</span>
         <span class="stat-value" id="stat-fixed-yearly">0,00 €</span>
       </div>
@@ -94,7 +94,7 @@
   <section id="view-assets" class="view" aria-labelledby="assets-heading" hidden>
     <h2 id="assets-heading">Vermögen</h2>
     <p class="hint">Nur Anzeige, keine doppelte Pflege: Die Werte kommen live aus der Finanzen-App. Bearbeiten geht weiterhin drüben.</p>
-    <div class="stat-card" id="assets-total-card" hidden>
+    <div class="stat-card" id="assets-total-card" data-accent="teal" hidden>
       <span class="stat-label">Gesamt</span>
       <span class="stat-value" id="assets-total-value">0,00 €</span>
     </div>

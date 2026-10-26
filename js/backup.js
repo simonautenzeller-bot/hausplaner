@@ -14,10 +14,10 @@
   var GUID_RE = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 
   var CSS =
-    ".ab-panel [hidden],.ab-banner[hidden]{display:none!important}" +
+    ".ab-panel [hidden],.ab-banner[hidden],.ab-dialog [hidden]{display:none!important}" +
     ".ab-panel p{margin:0 0 10px}" +
     ".ab-help,.ab-status{font-size:.92em;color:var(--ab-muted,inherit)}" +
-    ".ab-sub{margin:16px 0 8px!important;font-weight:700}" +
+    ".ab-adv{margin:16px 0 4px}.ab-adv summary{cursor:pointer;font-weight:700;margin:0 0 10px}" +
     ".ab-actions{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}" +
     ".ab-btn{font:inherit;cursor:pointer;padding:10px 14px;border-radius:var(--ab-radius,8px);border:1px solid var(--ab-border,#888);background:transparent;color:inherit}" +
     ".ab-btn--primary{background:var(--ab-accent,#2e7d32);color:var(--ab-accent-text,#fff);border-color:transparent}" +
@@ -43,6 +43,7 @@
   var checking = false;
   var pending = false;
   var deferred = false;
+  var lastManual = null;
   var panels = [];
   var banner = null;
   var toastEl = null;
@@ -87,13 +88,14 @@
     toastTimer = setTimeout(function () { toastEl.classList.remove("ab-show"); }, 2600);
   }
 
-  function confirmDialog(message, okLabel) {
-    if (typeof confirmEl.showModal !== "function") return Promise.resolve(window.confirm(message));
+  function confirmDialog(message, okLabel, infoOnly) {
+    if (typeof confirmEl.showModal !== "function") return Promise.resolve(infoOnly ? window.alert(message) : window.confirm(message));
     return new Promise(function (resolve) {
       var ok = confirmEl.querySelector("[data-ab-ok]");
       var cancel = confirmEl.querySelector("[data-ab-cancel]");
       confirmEl.querySelector("[data-ab-msg]").textContent = message;
       ok.textContent = okLabel || "OK";
+      cancel.hidden = !!infoOnly;
       var done = false;
       function finish(result) {
         if (done) return;
@@ -179,14 +181,14 @@
       if (shareable) {
         try {
           await navigator.share({ files: [shareable], title: opts.appName + " Backup" });
-          return "Teilen";
+          return { via: "Teilen", file: shareable.name };
         } catch (e) {
           if (e && e.name === "AbortError") return null;
         }
       }
     }
     downloadJson(json, base + ".json");
-    return "Download";
+    return { via: "Download", file: base + ".json" };
   }
 
   // ---------- OneDrive (Microsoft Graph, Authorization-Code-Flow mit PKCE, ohne Server) ----------
@@ -296,8 +298,8 @@
 
   // ---------- Ablauf ----------
 
-  function markBackup(via) {
-    writeJson(key("meta"), { lastAt: new Date().toISOString(), via: via });
+  function markBackup(via, file) {
+    writeJson(key("meta"), { lastAt: new Date().toISOString(), via: via, file: file || "" });
     pending = false;
     renderAll();
   }
@@ -332,9 +334,10 @@
 
       if (!interactive) return "needs-tap";
 
-      var via = await shareOrDownload(json, stamp);
-      if (!via) return "cancelled";
-      markBackup(via);
+      var res = await shareOrDownload(json, stamp);
+      if (!res) return "cancelled";
+      lastManual = res;
+      markBackup(res.via, res.file);
       return "manual";
     } finally {
       busy = false;
@@ -374,8 +377,14 @@
   async function backupNow() {
     if (!isActive()) { toast("Im Demo-Modus gibt es kein Backup"); return; }
     var result = await runBackup(true);
-    if (result === "folder") toast("Backup im Ordner gespeichert");
-    else if (result === "manual") toast("Backup erstellt");
+    if (result === "folder") {
+      toast("Backup im Ordner „" + folderHandle.name + "“ gespeichert");
+    } else if (result === "manual" && lastManual && lastManual.via === "Download") {
+      confirmDialog("Die Datei „" + lastManual.file + "“ wurde in den Download-Ordner deines Geräts geladen. " +
+        "Sie liegt damit noch nicht in OneDrive: Öffne die OneDrive-App und lade sie dort über „Hochladen“ aus dem Ordner „Downloads“ hoch.", "Verstanden", true);
+    } else if (result === "manual") {
+      toast("Backup geteilt");
+    }
   }
 
   function startRestore() { fileInput.click(); }
@@ -442,6 +451,10 @@
       var age = Math.floor((Date.now() - new Date(meta.lastAt).getTime()) / 86400000);
       status = "Letztes Backup: " + formatDate(meta.lastAt) + " (" + (meta.via || "–") + ") · " +
         (age >= INTERVAL_DAYS ? "jetzt fällig" : "nächstes in " + daysText(INTERVAL_DAYS - age));
+      if (meta.via === "Download") {
+        status += ". Die Datei „" + (meta.file || "…") + "“ liegt im Download-Ordner deines Geräts, noch nicht in OneDrive. " +
+          "In der OneDrive-App über „Hochladen“ ablegen.";
+      }
     }
     el.querySelector("[data-ab-status]").textContent = status;
 
@@ -456,8 +469,8 @@
     } else if (connected) {
       help = "Beim Öffnen lädt die App ein fälliges Backup automatisch in dein OneDrive (siehe unten).";
     } else {
-      help = "Dein Browser darf nicht selbst in Ordner schreiben. Verbinde unten OneDrive, " +
-        "oder die App erinnert dich einmal pro Woche und du legst die Datei über „Teilen“ in OneDrive ab.";
+      help = "Dein Browser darf nicht selbst in Ordner schreiben. Die App erinnert dich deshalb einmal pro Woche: " +
+        "tippe dann auf „Jetzt sichern“ und wähle im Teilen-Menü OneDrive (bzw. am iPhone „In Dateien sichern“ → OneDrive).";
     }
     el.querySelector("[data-ab-help]").textContent = help;
 
@@ -477,6 +490,8 @@
       : "Einmal bei Microsoft eine App registrieren (Schritte in der README) und die Client-ID hier einfügen. Weiterleitungs-URI: ") + redirectUri();
     var input = el.querySelector("[data-ab-client]");
     if (document.activeElement !== input) input.value = clientId();
+    var adv = el.querySelector("[data-ab-adv]");
+    if (!adv.dataset.init) { adv.dataset.init = "1"; adv.open = connected; }
     el.querySelector("[data-ab=od-connect]").hidden = connected;
     el.querySelector("[data-ab=od-disconnect]").hidden = !connected;
   }
@@ -548,7 +563,7 @@
         '<button type="button" class="' + btn + '" data-ab="folder" hidden></button>' +
         '<button type="button" class="' + btn + '" data-ab="folder-clear" hidden>Backup-Ordner entfernen</button>' +
       '</div>' +
-      '<p class="ab-sub">OneDrive (privat)</p>' +
+      '<details class="ab-adv" data-ab-adv><summary>Erweitert: direkt in OneDrive hochladen</summary>' +
       '<p class="ab-status" data-ab-od-status></p>' +
       '<div data-ab-od-setup>' +
         '<p class="ab-help" data-ab-od-help></p>' +
@@ -557,7 +572,8 @@
       '<div class="ab-actions">' +
         '<button type="button" class="' + primary + '" data-ab="od-connect">Mit OneDrive verbinden</button>' +
         '<button type="button" class="' + btn + '" data-ab="od-disconnect" hidden>OneDrive trennen</button>' +
-      '</div>';
+      '</div>' +
+      '</details>';
     el.addEventListener("click", function (e) {
       var target = e.target.closest("[data-ab]");
       if (target) panelAction(target.getAttribute("data-ab"));

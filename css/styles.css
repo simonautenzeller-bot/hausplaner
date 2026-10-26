@@ -27,7 +27,22 @@
   --accent-violet-bg: #ece3fb;
 
   color-scheme: light;
+
+  /* Wochen-Backup (js/backup.js) übernimmt die Farben der App */
+  --ab-card: var(--surface);
+  --ab-text: var(--text);
+  --ab-muted: var(--text-muted);
+  --ab-border: var(--border);
+  --ab-accent: var(--primary);
+  --ab-accent-text: var(--primary-contrast);
+  --ab-warn: var(--accent-amber);
+  --ab-radius: 12px;
+  --ab-input: var(--surface);
 }
+
+.ab-banner { margin: 12px 0 0; box-shadow: var(--shadow); }
+.ab-actions .btn { width: 100%; }
+.ab-banner-actions .btn { width: auto; }
 
 :root[data-theme='dark'],
 :root[data-theme='dim'],

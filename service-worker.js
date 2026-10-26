@@ -1,10 +1,11 @@
-const CACHE_NAME = 'hausplaner-cache-v10';
+const CACHE_NAME = 'hausplaner-cache-v11';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/styles.css',
   './js/store.js',
+  './js/backup.js',
   './js/ui.js',
   './js/main.js',
   './icons/icon.svg',

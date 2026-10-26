@@ -262,6 +262,7 @@
   function setDemoMode(on) {
     store.setMode(on ? 'demo' : 'live');
     ui.renderAll();
+    AppBackup.refresh();
     ui.showToast(on ? 'Demo-Modus aktiv – das sind Beispieldaten, deine echten Daten sind sicher' : 'Demo-Modus beendet – deine echten Daten sind wieder da');
   }
   document.getElementById('btn-toggle-demo').addEventListener('click', () => {
@@ -284,6 +285,7 @@
     a.remove();
     URL.revokeObjectURL(url);
     ui.showToast('Export gestartet');
+    if (!store.isDemoMode()) AppBackup.markExternal('Export');
   });
 
   // Import
@@ -306,6 +308,7 @@
     }
     ui.renderAll();
     ui.showToast('Import erfolgreich');
+    if (!store.isDemoMode()) AppBackup.markExternal('Wiederherstellung');
   });
 
   // Reset
@@ -333,6 +336,22 @@
   }
   ui.renderVersion();
   ui.renderAll();
+  AppBackup.init({
+    appId: 'hausplaner',
+    appName: 'Hausplaner+',
+    filePrefix: 'Hausplaner',
+    getData: () => (store.isDemoMode() ? null : store.getData()),
+    restore: (text) => {
+      if (!store.importData(text).ok) return false;
+      ui.renderAll();
+      return true;
+    },
+    isFresh: () => store.wasFresh(),
+    bannerParent: document.getElementById('main-content'),
+    btnClass: 'btn btn-secondary',
+    btnPrimaryClass: 'btn btn-primary',
+  });
+  document.getElementById('backup-slot').appendChild(AppBackup.createPanel());
   switchView(location.hash.slice(1) || 'dashboard');
 
   // Lebt die Finanzen-App in einem anderen Tab derselben Origin, hier live mitziehen.

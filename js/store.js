@@ -6,7 +6,7 @@
   const MODE_KEY = 'hausplaner:mode';
   const FINANZEN_KEY = 'finanzen-app:v3';
   const SCHEMA_VERSION = 1;
-  const APP_VERSION = '1.7.0';
+  const APP_VERSION = '1.8.0';
 
   function uid() {
     if (window.crypto?.randomUUID) return crypto.randomUUID();
@@ -99,10 +99,14 @@
     };
   }
 
+  // true, wenn die echten Daten fehlten (Erststart oder Browser-Speicher geleert)
+  let freshStart = false;
+
   function load() {
     const key = currentKey();
     try {
       const raw = localStorage.getItem(key);
+      freshStart = !raw && getMode() === 'live';
       if (!raw) {
         const seeded = seedForMode();
         localStorage.setItem(key, JSON.stringify(seeded));
@@ -110,6 +114,7 @@
       }
       return normalize(JSON.parse(raw));
     } catch {
+      freshStart = getMode() === 'live';
       return seedForMode();
     }
   }
@@ -305,6 +310,7 @@
 
   window.Store = {
     APP_VERSION,
+    wasFresh: () => freshStart,
     isDemoMode,
     setMode,
     getData,
